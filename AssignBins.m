@@ -12,8 +12,8 @@ function [Kd, NB_per_bin, Tot_unique_NBs, Tot_NBs, new_dist] = AssignBins(Kd, Nb
         % NB_per_bin - Number of NBs per new bin
         % Tot_unique_NBs - Number of bins (unique binding NBs)
         % Tot_NBs - Total number of NBs counting replicates
-        % new_dist - List containing Kd for each NB to be used to generate new dist
-
+        % new_dist - List containing Kd for each NB to be used to generate
+        % new disib
     %% Code
     new_Kd = [];
     
