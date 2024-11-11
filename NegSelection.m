@@ -1,4 +1,4 @@
-function [Bound_NBs, tot_bound, Kd] = NegSelection(Targets, Tot_NB, neg_avg_Kd, neg_std_Kd)
+function [Bound_NBs, tot_bound, Kd] = NegSelection(Targets, Tot_NB, a, b)
     
     %% Function Information
     % Function models the equilibrium biopanning process in negative selection of NBs
@@ -18,20 +18,19 @@ function [Bound_NBs, tot_bound, Kd] = NegSelection(Targets, Tot_NB, neg_avg_Kd, 
 
     % Outputs:
         % Bound_NBs - Array containing prevalence of NBs and associated Kd
-        % tot_bound - Total number of NBs recovered
-
+        % tot_bound - Total number of NBs recov
     %% Code
     
     % Define constants
     vol = (225 + 6.25) * 10^-6; % L, Volume of IVTT and beads
-    Kd_bins = 10^7; % Number of possible Kd values
+    Kd_bins = 10^5; % Number of possible Kd values
     
     % Convert to molarity
     c.Targets = Targets / (6.022 * 10^23) / vol; % Molar
     c.Tot_NB = Tot_NB / (6.022 * 10^23) / vol; % Molar
     
     % Define range for Kd values
-    Kd = linspace(1e-20, 100 * neg_avg_Kd, Kd_bins);
+    Kd = linspace(1e-20, 0.01, Kd_bins);
 
     % Calculate number of nanobodies per bin
     NB_per_Kd = c.Tot_NB * (betapdf(Kd, a, b) / sum(betapdf(Kd, a, b))); % Molar
@@ -40,7 +39,8 @@ function [Bound_NBs, tot_bound, Kd] = NegSelection(Targets, Tot_NB, neg_avg_Kd, 
     Bound_NBs = NB_per_Kd .* c.Targets ./ (Kd + c.Targets); % Molar
     Bound_molecules = Bound_NBs .* 6.022 * 10^23 * vol;
 
-    tot_bound = sum(Bound_molecules);
+    tot_bound = sum(Bound_molecules)
+    unbound = Tot_NB - tot_bound
     
     % Plot Kd distribution
     figure;
@@ -50,10 +50,10 @@ function [Bound_NBs, tot_bound, Kd] = NegSelection(Targets, Tot_NB, neg_avg_Kd, 
     plot(Kd, (NB_per_Kd * 6.022 * 10^23 * vol) - Bound_molecules);
     hold off
 
-    legend("All NB", 'Unbound nb')
+    legend("All NB", 'Unbound nb');
 
     title('Kd Distribution');
     xlabel('Kd (M)');
     ylabel('Number of Binders');
-    
+
 end

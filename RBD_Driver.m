@@ -21,11 +21,8 @@ Targets = beads.targets_pBead * beads.pVol * beads.vol;
 ribo_conc = 2 * 10^-6; % M [3]
 
 % Parameters for binding density function
-pos_avg_Kd = 10^-5;
-pos_std_Kd = pos_avg_Kd;
-
-neg_avg_Kd = 10^-3;
-neg_std_Kd = neg_avg_Kd;
+a = 12;
+b = 1.2;
 
 % Washing Variables
 wash_vol = 200 * 10^-6; % L
@@ -45,10 +42,14 @@ Library.plexity = 100; % Also unused
 
 %% Negative Selection
 
+Targets = 10e13;
+
 for i = 1:RBD_rounds
 
+    disp(["ROUND ", num2str(i)])
+
     % Equilibrium Biopanning to remove non-specific binding NBs
-    [Bound_NBs, tot_bound, Kd] = NegSelection(Targets * 2, Tot_NB, neg_avg_Kd, neg_std_Kd);
+    [Bound_NBs, tot_bound, Kd] = NegSelection(Targets, Tot_NB, a, b);
     
     % Washing binders off negative selection beads
     [~, tot_bound] = Washing(Tot_NB, tot_bound, Kd, Bound_NBs, wash_vol, num_wash);
@@ -57,20 +58,34 @@ for i = 1:RBD_rounds
     %% Positive Selection
     
     % Equilbrium Biopanning to bind NBs to Targets
-    [Bound_NBs, tot_bound] = PosSelection(Targets, Unbound_NBs, pos_avg_Kd, pos_std_Kd);
+    [Bound_NBs, tot_bound] = PosSelection(Targets, Unbound_NBs, a, b);
     
     % Washing binders off positive selection beads
     [Bound_NBs, tot_bound, Bound_molecules] = Washing(Tot_NB, tot_bound, Kd, Bound_NBs, wash_vol, num_wash);
     
-    length(Kd)
-    sum(Bound_molecules)
+    %length(Kd)
+    final = sum(Bound_molecules);
 
-    [Kds, NB_per_bin, Tot_Unique_NBs, Tot_NBs, new_dist] = AssignBins(Kd, Bound_molecules);
-    
-    
-    
-    [pos_avg_Kd, pos_std_Kd] = normfit(new_dist);
 
+    % 11/10 TEST
+
+    enrichment = 
+
+    %[Kds, NB_per_bin, Tot_Unique_NBs, Tot_NBs, new_dist] = AssignBins(Kd, Bound_molecules);
+    
+    %disp(["Total Unique NBs is: ", num2str(Tot_Unique_NBs)]);
+    %disp(["Total bound NBs is: ", num2str(Tot_NBs)])
+    
+    %params = mle(new_dist, 'distribution', 'beta');
+
+    %a = params(1);
+    %b = params(2);
+
+    % Display estimated parameters
+    %disp(['Estimated alpha: ', num2str(a)]);
+    %disp(['Estimated beta: ', num2str(b)]);
+
+    
     %% RNA Isolation
     
     
@@ -78,11 +93,11 @@ for i = 1:RBD_rounds
     
     
     %% PCR Amplification
-    enrichment_fraction = tot_bound / Tot_NB;
-    post_PCR_dist = Bound_NBs ./ enrichment_fraction;
+    %enrichment_fraction = tot_bound / Tot_NBs;
+    %post_PCR_dist = Bound_NBs ./ enrichment_fraction;
     
-    plot(Kd(1:100), post_PCR_dist(1:100))
-    title('Distribution after round of selection')
+    %plot(Kd(1:100), post_PCR_dist(1:100))
+    %title('Distribution after round of selection')
 
 end
 %% References
@@ -94,3 +109,6 @@ end
 % 3. https://www.neb.com/en/-/media/nebus/files/pdf-faq/purexpress-faqs.pdf?rev=5e75bc74e5aa42a191a69e2b648e2b0e&hash=37662D362B00589C475256C068DFECB2
 
 % 4. https://assets.thermofisher.com/TFS-Assets/LSG/manuals/MAN0015761_DynabeadsMyOneStreptavidin_T1_UG.pdf
+
+close all;
+
