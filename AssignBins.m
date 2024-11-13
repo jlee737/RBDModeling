@@ -33,7 +33,7 @@ function [Kd, NB_per_bin, Tot_unique_NBs, Tot_NBs, new_dist] = AssignBins(Kd, Nb
 
     Kd = new_Kd;
     NB_per_bin = ones(1,length(Kd));
-    Tot_unique_NBs = length(Kd);
+    Tot_unique_NBs = length(new_Kd);
     Tot_NBs = sum(NB_per_bin);
 
 end
